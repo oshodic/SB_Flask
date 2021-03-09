@@ -1,15 +1,25 @@
-from flask import Flask
+from flask import Flask, render_template, request
+from flask_debugtoolbar import DebugToolbarExtension
+from stories import story
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "secret"
 
-@app.route('/welcome')
-def welcome_page():
-  return "Welcome!"
+debug = DebugToolbarExtension(app)
 
-@app.route('/welcome/home')
-def welcome_home():
-  return "Welcome home!"
+@app.route("/")
+def ask_questions():
+  """Generate and show form to ask words"""
 
-@app.route('/welcome/back')
-def welcome_back():
-  return 'Welcome back!'
+  prompts = story.prompts
+
+  return render_template("questions.html", prompts=prompts)
+
+@app.route("/story")
+def show_story():
+  """Show story results"""
+
+  text = story.generate(request.args)
+
+  return render_template("story.html", text=text)
